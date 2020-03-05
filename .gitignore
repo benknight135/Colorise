@@ -1,0 +1,5 @@
+input/*
+output/*
+output_super/*
+__pycache__/*
+.vscode/*
