@@ -5,3 +5,5 @@ import image_convert
 image_convert.video_to_images("input/vid.mp4","input")
 ml_colorise.test("input","output",ml_colorise.ML_TYPE_TF,ml_colorise.ML_MODE_COLORIZE)
 image_convert.images_to_video("output")
+ml_colorise.test("output","output_super",ml_colorise.ML_TYPE_DEEPAI,ml_colorise.ML_MODE_SUPER_RES)
+image_convert.images_to_video("output_super")

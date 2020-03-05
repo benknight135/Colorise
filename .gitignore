@@ -1,7 +1,13 @@
+__pycache__/*
+.vscode/*
+*.pyc
+
 input/*
 tmp/*
 output/*
 output_super/*
-__pycache__/*
-.vscode/*
-*.pyc
+
+!input/placeholder
+!tmp/placeholder
+!output/placeholder
+!output_super/placeholder
