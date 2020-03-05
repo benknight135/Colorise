@@ -123,6 +123,7 @@ class TF_COLORISE():
         out_bgr_resize = cv2.resize(out_bgr, (i_img_cols,i_img_rows), cv2.INTER_CUBIC)
 
         cv2.imwrite(out_img_file, out_bgr_resize)
+        return out_bgr_resize
 
 tf_col = TF_COLORISE()
 
@@ -156,8 +157,88 @@ def deepai(in_img_file,out_img_file,ml_mode=ML_MODE_COLORIZE):
 
             handle.write(block)
 
+    img = cv2.imread(out_img_file)
+    return img
+
 def tf(in_img_file,out_img_file,ml_mode=ML_MODE_COLORIZE):
     tf_col.run(in_img_file,out_img_file)
+
+def test_video(input_file,output_file,tmp_folder="tmp",ml_type=ML_TYPE_DEEPAI,ml_mode=ML_MODE_COLORIZE,start_frame=0,end_frame=None):
+    if (ml_type == ML_TYPE_TF):
+        tf_col.pre_load_model(ml_mode)
+    
+    try:
+        # creating a folder named data 
+        if not os.path.exists(tmp_folder): 
+            os.makedirs(tmp_folder)
+    
+    # if not created then raise error 
+    except OSError: 
+        print ('Error: Creating directorys')
+
+    print("Processing images with " + ml_type + " for : " + ml_mode)
+
+    if (end_frame is None):
+        end_frame = 999999999
+    # Read the video from specified path 
+    cam = cv2.VideoCapture(input_file)
+
+    if cam.isOpened(): 
+        # get vcap property 
+        width  = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))  # float
+        height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT)) # float
+        fps = cam.get(cv2.CAP_PROP_FPS)
+        totalframes = int(cam.get(cv2.CAP_PROP_FRAME_COUNT)) 
+
+        print(width,height)
+
+        fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+        out = cv2.VideoWriter(output_file,fourcc, fps, (width,height))
+        
+        # frame 
+        currentframe = 0
+        
+        while(True): 
+            
+            # reading from frame 
+            ret,frame = cam.read()
+
+            complete = ((currentframe+1)/totalframes) * 100
+
+            if (currentframe >= start_frame):
+                if ret: 
+                    # if video is still left continue creating images 
+                    name = tmp_folder + "/img.png"
+                    print ('Creating {}... {}/{} [{:.2f}%]'.format(name,currentframe,totalframes,complete)) 
+            
+                    # writing the extracted images 
+                    cv2.imwrite(name, frame)
+
+                    img_ml = None
+                    if (ml_type == ML_TYPE_DEEPAI):
+                        img_ml = deepai(name,tmp_folder+'/img_col.png',ml_mode)
+                    elif (ml_type == ML_TYPE_TF):
+                        img_ml = tf_col.run(name,tmp_folder+'/img_col.png')
+                    else:
+                        print("Invalid ML Type: ",ml_type)
+                        break
+
+                    out.write(img_ml)
+            
+                else: 
+                    break
+            else:
+                print("skipping...{}/{} [{:.2f}%]".format(currentframe,start_frame,complete))
+            
+            currentframe += 1
+
+            if currentframe > end_frame:
+                break
+        
+        # Release all space and windows once done 
+        cam.release()
+        out.release()
+        cv2.destroyAllWindows() 
 
 def test(input_folder,output_folder,ml_type=ML_TYPE_DEEPAI,ml_mode=ML_MODE_COLORIZE,skip_files=0,input_file_prefix="img"):
     if (ml_type == ML_TYPE_TF):

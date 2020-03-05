@@ -1,5 +1,7 @@
 input/*
+tmp/*
 output/*
 output_super/*
 __pycache__/*
 .vscode/*
+*.pyc

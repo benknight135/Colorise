@@ -1,6 +1,7 @@
 import cv2 
 import glob
 import natsort
+import os
 
 def images_to_video(input_folder,output_file="vid.avi",fps=25,input_file_prefix="img"):
     video_file = input_folder+"/vid.avi"
