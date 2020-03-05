@@ -198,47 +198,52 @@ def test_video(input_file,output_file,tmp_folder="tmp",ml_type=ML_TYPE_DEEPAI,ml
         # frame 
         currentframe = 0
         
-        while(True): 
-            
-            # reading from frame 
-            ret,frame = cam.read()
+        try:
+            while(True): 
+                
+                # reading from frame 
+                ret,frame = cam.read()
 
-            complete = ((currentframe+1)/totalframes) * 100
+                complete = ((currentframe+1)/totalframes) * 100
 
-            if (currentframe >= start_frame):
-                if ret: 
-                    # if video is still left continue creating images 
-                    name = tmp_folder + "/img.png"
-                    print ('Creating {}... {}/{} [{:.2f}%]'.format(name,currentframe,totalframes,complete)) 
-            
-                    # writing the extracted images 
-                    cv2.imwrite(name, frame)
+                if (currentframe >= start_frame):
+                    if ret: 
+                        # if video is still left continue creating images 
+                        name = tmp_folder + "/img.png"
+                        print ('Creating {}... {}/{} [{:.2f}%]'.format(name,currentframe,totalframes,complete)) 
+                
+                        # writing the extracted images 
+                        cv2.imwrite(name, frame)
 
-                    img_ml = None
-                    if (ml_type == ML_TYPE_DEEPAI):
-                        img_ml = deepai(name,tmp_folder+'/img_col.png',ml_mode)
-                    elif (ml_type == ML_TYPE_TF):
-                        img_ml = tf_col.run(name,tmp_folder+'/img_col.png')
-                    else:
-                        print("Invalid ML Type: ",ml_type)
+                        img_ml = None
+                        if (ml_type == ML_TYPE_DEEPAI):
+                            img_ml = deepai(name,tmp_folder+'/img_col.png',ml_mode)
+                        elif (ml_type == ML_TYPE_TF):
+                            img_ml = tf_col.run(name,tmp_folder+'/img_col.png')
+                        else:
+                            print("Invalid ML Type: ",ml_type)
+                            break
+
+                        out.write(img_ml)
+                
+                    else: 
                         break
+                else:
+                    print("skipping...{}/{} [{:.2f}%]".format(currentframe,start_frame,complete))
+                
+                currentframe += 1
 
-                    out.write(img_ml)
-            
-                else: 
+                if currentframe > end_frame:
                     break
-            else:
-                print("skipping...{}/{} [{:.2f}%]".format(currentframe,start_frame,complete))
-            
-            currentframe += 1
 
-            if currentframe > end_frame:
-                break
+        except KeyboardInterrupt:
+            pass
         
         # Release all space and windows once done 
         cam.release()
         out.release()
-        cv2.destroyAllWindows() 
+        cv2.destroyAllWindows()
+        print("Closed")
 
 def test(input_folder,output_folder,ml_type=ML_TYPE_DEEPAI,ml_mode=ML_MODE_COLORIZE,skip_files=0,input_file_prefix="img"):
     if (ml_type == ML_TYPE_TF):

@@ -18,12 +18,15 @@ def images_to_video(input_folder,output_file="vid.avi",fps=25,input_file_prefix=
     
     list_length = len(sorted_image_file_list)
     i = 0
-    for image_file in sorted_image_file_list:
-        complete = ((i+1)/list_length) * 100
-        print("Reading frame {}... [{:.2f}%]".format(image_file,complete))
-        img = cv2.imread(image_file)
-        out.write(img)
-        i += 1
+    try:
+        for image_file in sorted_image_file_list:
+            complete = ((i+1)/list_length) * 100
+            print("Reading frame {}... [{:.2f}%]".format(image_file,complete))
+            img = cv2.imread(image_file)
+            out.write(img)
+            i += 1
+    except KeyboardInterrupt:
+        pass
 
     out.release()
 
@@ -48,31 +51,34 @@ def video_to_images(input_video,output_folder,output_file_prefix="img",start_fra
     currentframe = 0
     totalframes = int(cam.get(cv2.CAP_PROP_FRAME_COUNT))
     
-    while(True): 
-        
-        # reading from frame 
-        ret,frame = cam.read()
+    try:
+        while(True): 
+            
+            # reading from frame 
+            ret,frame = cam.read()
 
-        complete = ((currentframe+1)/totalframes) * 100
+            complete = ((currentframe+1)/totalframes) * 100
 
-        if (currentframe >= start_frame):
-            if ret: 
-                # if video is still left continue creating images 
-                name = output_folder + "/" + output_file_prefix + str(currentframe) + '.png'
-                print ('Creating {}... {}/{} [{:.2f}%]'.format(name,currentframe,totalframes,complete)) 
-        
-                # writing the extracted images 
-                cv2.imwrite(name, frame) 
-        
-            else: 
+            if (currentframe >= start_frame):
+                if ret: 
+                    # if video is still left continue creating images 
+                    name = output_folder + "/" + output_file_prefix + str(currentframe) + '.png'
+                    print ('Creating {}... {}/{} [{:.2f}%]'.format(name,currentframe,totalframes,complete)) 
+            
+                    # writing the extracted images 
+                    cv2.imwrite(name, frame) 
+            
+                else: 
+                    break
+            else:
+                print("skipping...{}/{} [{:.2f}%]".format(currentframe,start_frame,complete))
+            
+            currentframe += 1
+
+            if currentframe > end_frame:
                 break
-        else:
-            print("skipping...{}/{} [{:.2f}%]".format(currentframe,start_frame,complete))
-        
-        currentframe += 1
-
-        if currentframe > end_frame:
-            break
+    except KeyboardInterrupt:
+        pass
     
     # Release all space and windows once done 
     cam.release() 
