@@ -4,7 +4,7 @@ import natsort
 import os
 
 def images_to_video(input_folder,output_file="vid.avi",fps=25,input_file_prefix="img"):
-    video_file = input_folder+"/vid.avi"
+    video_file = input_folder+"/"+output_file
 
     image_file_list = glob.glob(input_folder+"/"+input_file_prefix+'*.png')
     sorted_image_file_list = natsort.natsorted(image_file_list)
@@ -27,7 +27,7 @@ def images_to_video(input_folder,output_file="vid.avi",fps=25,input_file_prefix=
             i += 1
     except KeyboardInterrupt:
         pass
-
+    print("Complete")
     out.release()
 
 def video_to_images(input_video,output_folder,output_file_prefix="img",start_frame=0,end_frame=None):

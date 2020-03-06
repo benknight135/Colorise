@@ -6,6 +6,8 @@ input/*
 tmp/*
 output/*
 output_super/*
+output_tf/*
+output_super_tf/*
 
 !input/placeholder
 !tmp/placeholder

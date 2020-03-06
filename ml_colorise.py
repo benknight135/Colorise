@@ -245,7 +245,7 @@ def test_video(input_file,output_file,tmp_folder="tmp",ml_type=ML_TYPE_DEEPAI,ml
         cv2.destroyAllWindows()
         print("Closed")
 
-def test(input_folder,output_folder,ml_type=ML_TYPE_DEEPAI,ml_mode=ML_MODE_COLORIZE,skip_files=0,input_file_prefix="img"):
+def test(input_folder,output_folder,ml_type=ML_TYPE_DEEPAI,ml_mode=ML_MODE_COLORIZE,skip_files=0,max_files=None,input_file_prefix="img"):
     if (ml_type == ML_TYPE_TF):
         tf_col.pre_load_model(ml_mode)
     
@@ -265,8 +265,16 @@ def test(input_folder,output_folder,ml_type=ML_TYPE_DEEPAI,ml_mode=ML_MODE_COLOR
 
     i = 0
     list_length = len(sorted_image_file_list)
+
+    if max_files is not None:
+        if max_files < list_length:
+            list_length = max_files
+
     for img_file_path in sorted_image_file_list:
         complete = ((i+1)/list_length) * 100
+        if max_files is not None:
+            if i > max_files:
+                break
         if i >= skip_files:
             img_filename = os.path.basename(img_file_path)
             print("Processing {}... [{:.2f}%]".format(img_filename,complete))
@@ -278,3 +286,4 @@ def test(input_folder,output_folder,ml_type=ML_TYPE_DEEPAI,ml_mode=ML_MODE_COLOR
                 print("Invalid ML Type: ",ml_type)
                 break
         i += 1
+    print("Complete")
